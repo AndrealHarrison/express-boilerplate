@@ -100,14 +100,25 @@ response status code:
 
 ```
 ---
+```json
+EDIT /log
+content-type: application/json
+
+{
+   "log_id": 12345,
+   "title": string,
+   "content": string,
+} 
+response status code: 
+- 200 OK
+
+```
+---
 
 ```json
 DELETE /log/12345
 {
     "log_id": 12345,
-    "title": string,
-    "content": string,
-    "creator_id": number,
 }
 response status code: 
 - 202 Accepted
