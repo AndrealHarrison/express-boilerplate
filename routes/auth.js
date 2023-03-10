@@ -52,7 +52,7 @@ router.post('/signup', (req, res) => {
         username: username
     })
     console.log(users)
-    res.send({msg: `user: ${username} created!`});
+    res.send({msg: `user: ${username} created! Token: ${token}`});
 });
 
 router.post('/login', (req, res) => {
@@ -62,7 +62,7 @@ router.post('/login', (req, res) => {
     if(objSession) {
         jwt.verify(objSession.token, objUser.password, function(err, decoded){
             if(!err){
-                var msg = `user ${user} successfully logged in!`;
+                var msg = `user ${user} successfully logged in! Token: ${objSession.token}`;
                 res.send(msg);
             } else {
                 res.send(err);
@@ -86,7 +86,50 @@ router.post('/createPost', (req, res) => {
     });
 
     res.send("post created");
+});
 
+router.get('/getPosts', (req, res) => {
+    res.send(posts);
+});
+
+router.delete('/deletePost/:id', (req, res) => {
+    let id = req.params.id;
+    const {username} = req.body;
+    let objUser = users.find(x => x.username === username);
+    let token = req.headers.authorization;
+    token = token.split(' ')[1];
+    jwt.verify(token, objUser.password, function(err, decoded){
+        const postToBeDeleted = posts.find(x => x.postID === parseInt(id));
+        if(parseInt(objUser.userID) === postToBeDeleted.userID) {
+            var index = posts.findIndex(x => x.postID === parseInt(id));  
+            posts.splice(index, 1);
+            res.send("post deleted");
+        }
+        else {
+            res.send("Unauthorized user!");
+        }
+    });
+    res.send("Unauthorized user!");
+});
+
+router.put('/updatePost/:id', (req, res) => {
+    let id = req.params.id;
+    const {username} = req.body;
+    let objUser = users.find(x => x.username === username);
+    let token = req.headers.authorization;
+    token = token.split(' ')[1];
+    jwt.verify(token, objUser.password, function(err, decoded){
+        const postToBeEdited = posts.find(x => x.postID === parseInt(id));
+        if(parseInt(objUser.userID) === postToBeEdited.userID) {
+            var index = posts.findIndex(x => x.postID === parseInt(id));  
+            posts[index].post = "this post has been edited!";
+            res.send("post edited");
+        }
+        else {
+            res.send("Unauthorized user!");
+        }
+    });
+    res.send("Unauthorized user!");
 });
 
 
